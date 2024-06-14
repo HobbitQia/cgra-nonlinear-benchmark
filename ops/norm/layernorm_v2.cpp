@@ -35,6 +35,7 @@ void kernel(float input[], float output[], float alpha, float beta)
     float var_eps = variance + eps;
     float inv_stddev = invsqrt(var_eps);
     for (int i = 0; i < NTAPS; i++) {
-        output[i] = (input[i] - mean) * inv_stddev * alpha + beta;
+        float x = input[i] - mean;
+        output[i] = x * inv_stddev * alpha + beta;
     }
 }

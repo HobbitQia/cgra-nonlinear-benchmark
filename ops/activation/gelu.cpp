@@ -17,19 +17,11 @@ void kernel(float input[], float output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
-    float max = -10000.0;
-    float sum = 0.0;
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
-        if (x > max) max = x;
-    }
-    for (int i = 0; i < NTAPS; i++) {
-        float x = input[i];
-        float e = exp(x - max);
-        output[i] = e;
-        sum += e;
-    }
-    for (int i = 0; i < NTAPS; i++) {
-        output[i] /= sum;
+        float xx = 0.79788456 * (x + 0.044715 * x * x * x);
+        float exp_2x = exp(-(xx * 2));
+        float tanh_x = (1 - exp_2x) / (1 + exp_2x);
+        output[i] = 0.5 * x * (1 + tanh_x);
     }
 }

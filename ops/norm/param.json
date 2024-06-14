@@ -2,7 +2,7 @@
   "kernel"                : "_Z6kernelPfS_ff",
   "targetFunction"        : true,
   "targetNested"          : false,
-  "targetLoopsID"         : [0],
+  "targetLoopsID"         : [1],
   "doCGRAMapping"         : true,
   "row"                   : 4,
   "column"                : 4,
