@@ -21,12 +21,15 @@ void kernel(float input[], float output[], float alpha)
 /*   output:           output sample array */
 {
     float variance = 0.0;
+    #pragma clang loop unroll(disable) vectorize(disable)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
         variance += x * x;
     }
-    variance /= NTAPS;;
+    variance /= NTAPS;
+    
     float inv_stddev = invsqrt(variance);
+    #pragma clang loop unroll(disable) vectorize(disable)
     for (int i = 0; i < NTAPS; i++) {
         output[i] = (input[i]) * inv_stddev * alpha;
     }

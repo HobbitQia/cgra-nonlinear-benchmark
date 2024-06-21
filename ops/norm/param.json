@@ -1,5 +1,5 @@
 {
-  "kernel"                : "_Z6kernelPfS_ff",
+  "kernel"                : "_Z6kernelPfS_f",
   "targetFunction"        : true,
   "targetNested"          : false,
   "targetLoopsID"         : [1],
