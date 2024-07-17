@@ -19,8 +19,9 @@ void kernel(float input[], float output[], float scale, float alpha)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
+    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
-        output[i] = scale * (max(0, x)) + min(0, alpha * (exp(x) - 1));
+        output[i] = scale * (max(0.0, x)) + min(0.0, alpha * (exp(x) - 1.0));
     }
 }

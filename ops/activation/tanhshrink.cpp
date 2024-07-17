@@ -17,9 +17,10 @@ void kernel(float input[], float output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
+    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
-        float exp_2x = exp(-(x * 2));
-        output[i] = x - (1 - exp_2x) / (1 + exp_2x);
+        float exp_2x = exp(x * (-2.0));
+        output[i] = x - (1.0 - exp_2x) / (1.0 + exp_2x);
     }
 }

@@ -1,6 +1,6 @@
 {
   "kernel"                : "_Z6kernelPfS_if",
-  "targetFunction"        : true,
+  "targetFunction"        : false,
   "targetNested"          : false,
   "targetLoopsID"         : [0],
   "doCGRAMapping"         : true,
@@ -22,8 +22,11 @@
                             },
   "optPipelined"          : ["load", "store"],
   "additionalFunc"        : {
-                              "load" : [4],
-                              "store": [4]
+                              "call" : [4],
+                              "load" : [2,5,8],
+                              "store": [0,3,6],
+                              "lut" : [0, 1, 2, 3, 4, 5, 6, 7],
+                              "complex" : [2, 4, 6, 0, 8]
                             }
 }
 

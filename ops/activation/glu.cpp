@@ -18,6 +18,7 @@ void kernel(float a[], float b[], float output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
+    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < NTAPS; i++) {
         float ai = a[i];
         float bi = b[i];

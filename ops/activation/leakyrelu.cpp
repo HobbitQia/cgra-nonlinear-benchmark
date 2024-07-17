@@ -18,6 +18,7 @@ void kernel(float input[], float output[], float negative_slope)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
+    #pragma clang loop vectorize(disable) unroll_count(1)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
         if (x >= 0) output[i] = x;
