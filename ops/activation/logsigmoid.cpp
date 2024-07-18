@@ -19,7 +19,7 @@ void kernel(float input[], float output[])
 {
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < NTAPS; i++) {
-        float x = input[i] - 1.0;
-        output[i] = log(sigmoid(x));
+        float x = input[i] - (float)(1.0);
+        output[i] = log(sigmoid(x) - (float)(1.0));
     }
 }

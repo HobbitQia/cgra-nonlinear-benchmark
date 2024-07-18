@@ -21,7 +21,7 @@ void kernel(float input[], float output[], float negative_slope)
     #pragma clang loop vectorize(disable) unroll_count(1)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
-        if (x >= 0) output[i] = x;
+        if (x >= (float)(0.0)) output[i] = x;
         else output[i] = negative_slope * x;
     }
 }

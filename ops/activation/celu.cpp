@@ -21,6 +21,6 @@ void kernel(float input[], float output[], float alpha)
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
-        output[i] = max(0.0, x) + min(0.0, alpha * (exp(x / alpha) - 1.0));
+        output[i] = max((float)(0.0), x) + min((float)(0.0), alpha * (exp(x / alpha) - (float)(1.0)));
     }
 }

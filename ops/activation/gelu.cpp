@@ -20,9 +20,9 @@ void kernel(float input[], float output[])
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
-        float xx = 0.79788456 * (x + 0.044715 * x * x * x);
-        float exp_2x = exp(xx * (-2.0));
-        float tanh_x = (1.0 - exp_2x) / (1.0 + exp_2x);
-        output[i] = 0.5 * x * (1.0 + tanh_x);
+        float xx = (float)(0.79788456) * (x + (float)(0.044715) * x * x * x);
+        float exp_2x = exp(xx * (float)(-2.0));
+        float tanh_x = ((float)(1.0) - exp_2x) / ((float)(1.0) + exp_2x);
+        output[i] = (float)(0.5) * x * ((float)(1.0) + tanh_x);
     }
 }
