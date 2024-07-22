@@ -8,11 +8,23 @@ float scale = 1.05;
 void kernel(float input[], float output[], float scale, float alpha);
 
 int main()
-{
+{    
+    #ifndef __STREAMING_ENBALED__
+        kernel(input, output, scale, alpha);
+    #else
+        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            kernel(input_buf, output_buf, scale, alpha);
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                output[i + j] = output_buf[j];
+            }
+        }
+    #endif
 
-  kernel(input, output, scale, alpha);
-
-  return 0;
+    return 0;
 }
 
 void kernel(float input[], float output[], float scale, float alpha)

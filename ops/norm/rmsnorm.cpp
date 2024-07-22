@@ -12,11 +12,33 @@ void rmsnorm_loop2(float input[], float output[], float *invsqrt, float alpha);
 int main()
 {
     float variance = 0.0;
-    rmsnorm_loop1(input, &variance);
-    variance /= NTAPS;
-    float var_eps = variance + eps;
-    float inv_stddev = invsqrt(var_eps);
-    rmsnorm_loop2(input, output, &inv_stddev, alpha);
+    #ifndef __STREAMING_ENBALED__
+        rmsnorm_loop1(input, &variance);
+        variance /= NTAPS;
+        float var_eps = variance + eps;
+        float inv_stddev = invsqrt(var_eps);
+        rmsnorm_loop2(input, output, &inv_stddev, alpha);
+    #else
+        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            rmsnorm_loop1(input_buf, &variance);
+        }
+        variance /= NTAPS;
+        float var_eps = variance + eps;
+        float inv_stddev = invsqrt(var_eps);
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            rmsnorm_loop2(input_buf, output_buf, &inv_stddev, alpha);
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                output[i + j] = output_buf[j];
+            }
+        }
+    #endif
 
     return 0;
 }

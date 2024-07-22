@@ -8,10 +8,22 @@ void kernel(float input[], float output[], float negative_slope);
 
 int main()
 {
+    #ifndef __STREAMING_ENBALED__
+        kernel(input, output, negative_slope);
+    #else
+        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            kernel(input_buf, output_buf, negative_slope);
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                output[i + j] = output_buf[j];
+            }
+        }
+    #endif
 
-  kernel(input, output, negative_slope);
-
-  return 0;
+    return 0;
 }
 
 void kernel(float input[], float output[], float negative_slope)

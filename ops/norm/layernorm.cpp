@@ -11,15 +11,38 @@ void layernorm_loop1(float input[], float *mean, float *mean_x2);
 void layernorm_loop2(float input[], float *mean, float *invsqrt, float alpha, float beta);
 
 int main()
-{
+{   
     float mean = 0.0, mean_x2 = 0.0;
-    layernorm_loop1(input, &mean, &mean_x2);
-    mean /= NTAPS;
-    mean_x2 /= NTAPS;
-    float variance = mean_x2 - mean * mean;
-    float var_eps = variance + eps;
-    float inv_stddev = invsqrt(var_eps);
-    layernorm_loop2(input, &mean, &inv_stddev, alpha, beta);
+    #ifnedf __STREAMING_ENBALED__
+        layernorm_loop1(input, &mean, &mean_x2);
+        mean /= NTAPS;
+        mean_x2 /= NTAPS;
+        float variance = mean_x2 - mean * mean;
+        float var_eps = variance + eps;
+        float inv_stddev = invsqrt(var_eps);
+        layernorm_loop2(input, &mean, &inv_stddev, alpha, beta);
+    #else
+        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            layernorm_loop1(input_buf, &mean, &mean_x2);
+        }
+        mean /= NTAPS;
+        mean_x2 /= NTAPS;
+        float variance = mean_x2 - mean * mean;
+        float var_eps = variance + eps;
+        float inv_stddev = invsqrt(var_eps);
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            layernorm_loop2(input_buf, &mean, &inv_stddev, alpha, beta);
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                output[i + j] = output_buf[j];
+            }
+        }
 
     return 0;
 }

@@ -10,9 +10,28 @@ void softmax_loop3(float input[], float output[], float *sum);
 int main()
 {
     float sum = 0.0, max = -10000.0;
-    softmax_loop1(input, output, &max);
-    softmax_loop2(input, output, &max, &sum);
-    softmax_loop3(input, output, &sum);
+    #ifndef __STREAMING_ENBALED__
+        softmax_loop1(input, output, &max);
+        softmax_loop2(input, output, &max, &sum);
+        softmax_loop3(input, output, &sum);
+    #else
+        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            softmax_loop1(input, output, &max);
+        }
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = output[i + j];
+            }
+            softmax_loop3(input, output, &sum);
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                output[i + j] = output_buf[j];
+            }
+        }
+    #endif
 
     return 0;
 }
@@ -47,6 +66,6 @@ void softmax_loop3(float input[], float output[], float *sum)
     float summ = *sum;
     #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
-        output[i] /= summ;
+        output[i] = input[i] / summ;
     }
 }
