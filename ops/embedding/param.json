@@ -7,7 +7,7 @@
   "row"                   : 4,
   "column"                : 4,
   "precisionAware"        : false,
-  "heterogeneity"         : false,
+  "heterogeneity"         : true,
   "isTrimmedDemo"         : true,
   "heuristicMapping"      : true,
   "parameterizableCGRA"   : false,
@@ -22,11 +22,11 @@
                             },
   "optPipelined"          : ["load", "store"],
   "additionalFunc"        : {
-                              "call" : [4],
-                              "load" : [2,5,8],
-                              "store": [0,3,6],
-                              "lut" : [0, 1, 2, 3, 4, 5, 6, 7],
-                              "complex" : [2, 4, 6, 0, 8]
+                              "call" : [4,8,7,10],
+                              "load" : [0,1,2,3],
+                              "store": [12,13,14,15],
+                              "lut" : [4,8,7,10],
+                              "complex" : [5,6,9,10]
                             }
 }
 

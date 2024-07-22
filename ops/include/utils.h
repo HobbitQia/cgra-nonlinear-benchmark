@@ -24,6 +24,16 @@ __attribute__((noinline)) float fp2fx(float x)
     return x + 1.0;    
 }
 
+__attribute__((noinline)) float fpQuantize(float x) 
+{
+    return x + 1;    
+}
+
+__attribute__((noinline)) int intQuantize(int x) 
+{
+    return x + 1;    
+}
+
 
 inline float exp(float x) {
     float int_x = fp2fx(x);

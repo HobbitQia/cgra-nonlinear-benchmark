@@ -6,30 +6,36 @@ float alpha = 0.2;
 
 const float eps = 1e-5;
 
-void kernel(float input[], float output[], float alpha);
+void rmsnorm_loop1(float input[], float *variance);
+void rmsnorm_loop2(float input[], float output[], float *invsqrt, float alpha);
 
 int main()
 {
+    float variance = 0.0;
+    rmsnorm_loop1(input, &variance);
+    variance /= NTAPS;
+    float var_eps = variance + eps;
+    float inv_stddev = invsqrt(var_eps);
+    rmsnorm_loop2(input, output, &inv_stddev, alpha);
 
-  kernel(input, output, alpha);
-
-  return 0;
+    return 0;
 }
 
-void kernel(float input[], float output[], float alpha)
-/*   input :           input sample array */
-/*   output:           output sample array */
+void rmsnorm_loop1(float input[], float *variance) 
 {
-    float variance = 0.0;
-    #pragma clang loop unroll(disable) vectorize(disable)
+    float var = *variance;
+    #pragma clang loop unroll_count(4) vectorize(disable)
     for (int i = 0; i < NTAPS; i++) {
         float x = input[i];
-        variance += x * x;
+        var += x * x;
     }
-    variance /= NTAPS;
-    
-    float inv_stddev = invsqrt(variance);
-    #pragma clang loop unroll(disable) vectorize(disable)
+    *variance = var;
+}
+
+void rmsnorm_loop2(float input[], float output[], float *invsqrt, float alpha) 
+{
+    float inv_stddev = *invsqrt;
+    #pragma clang loop unroll_count(4) vectorize(disable)
     for (int i = 0; i < NTAPS; i++) {
         output[i] = (input[i]) * inv_stddev * alpha;
     }

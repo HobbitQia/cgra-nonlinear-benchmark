@@ -8,7 +8,7 @@ KERNEL := _Z6kernelPfS_S_
 $(target): 
 	mkdir -p build
 	clang-12 -emit-llvm -fno-unroll-loops -O3 -o $(BUILD_DIR)/$(target).bc -c $(target).cpp
-	opt --loop-unroll --unroll-count=1 $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).bc
+	opt --loop-unroll --unroll-count=9 $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).bc
 	opt -load $(PASS_DIR)/libmapperPass.so -mapperPass $(BUILD_DIR)/$(target).bc
 	mv *.dot $(BUILD_DIR)	
 	dot -Tpng $(BUILD_DIR)/*.dot -o $(BUILD_DIR)/$(target).png
@@ -20,3 +20,6 @@ clean:
 	rm -rf $(BUILD_DIR)/*.ll
 	rm -rf $(BUILD_DIR)/*.bc
 	rm -rf $(BUILD_DIR)/*.json
+
+move:
+	mv $(BUILD_DIR)/*.png ../../dfg/fused/embedding/

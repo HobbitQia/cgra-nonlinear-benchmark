@@ -21,3 +21,6 @@ clean:
 	rm -rf $(BUILD_DIR)/*.ll
 	rm -rf $(BUILD_DIR)/*.bc
 	rm -rf $(BUILD_DIR)/*.json
+
+move:
+	mv $(BUILD_DIR)/*.png ../../dfg/fused/activation/

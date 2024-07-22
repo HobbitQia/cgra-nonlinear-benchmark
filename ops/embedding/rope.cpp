@@ -18,7 +18,7 @@ void kernel(float input[], float output[], int postion, float theta)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
-    #pragma clang loop unroll(disable) vectorize(disable)
+    #pragma clang loop unroll_count(4) vectorize(disable)
     for (int i = 0; i < NTAPS; i += 2) {
         float x = input[i];
         float y = input[i + 1];

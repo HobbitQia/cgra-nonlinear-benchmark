@@ -3,37 +3,50 @@
 float input[NTAPS];
 float output[NTAPS];
 
-void kernel(float input[], float output[]);
+void softmax_loop1(float input[], float output[], float *max);
+void softmax_loop2(float input[], float output[], float *max, float *sum);
+void softmax_loop3(float input[], float output[], float *sum);
 
 int main()
 {
+    float sum = 0.0, max = -10000.0;
+    softmax_loop1(input, output, &max);
+    softmax_loop2(input, output, &max, &sum);
+    softmax_loop3(input, output, &sum);
 
-  kernel(input, output);
-
-  return 0;
+    return 0;
 }
 
-void kernel(float input[], float output[])
-/*   input :           input sample array */
-/*   output:           output sample array */
+void softmax_loop1(float input[], float output[], float *max) 
 {
-    float max = -10000.0;
-    float sum = 0.0;
-    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(1)
+    float maxx = *max;
+    #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
         float x0 = input[i];
-        if (x0 > max) max = x0;
+        if (x0 > maxx) maxx = x0;
     }
-    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(1)
+    *max = maxx;
+}
+
+void softmax_loop2(float input[], float output[], float *max, float *sum) 
+{
+    float summ = *sum;
+    float maxx = *max;
+    #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
-        // float x = input[i];
         float x0 = input[i];
-        float e0 = exp(x0 - max);
+        float e0 = exp(x0 - maxx);
         output[i] = e0;
-        sum += e0;
+        summ += e0;
     }
-    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(1)
+    *sum = summ;
+}
+
+void softmax_loop3(float input[], float output[], float *sum) 
+{
+    float summ = *sum;
+    #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
-        output[i] /= sum;
+        output[i] /= summ;
     }
 }
