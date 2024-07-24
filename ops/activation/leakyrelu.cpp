@@ -1,17 +1,16 @@
 #include "../include/utils.h"
 
-float input[NTAPS];
-float output[NTAPS];
-float negative_slope = -0.1;
+DATA_TYPE input[NTAPS], output[NTAPS];
+const DATA_TYPE negative_slope = -3, const1 = 0;    // 0.0
 
-void kernel(float input[], float output[], float negative_slope);
+void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE negative_slope);
 
 int main()
 {
     #ifndef __STREAMING_ENBALED__
         kernel(input, output, negative_slope);
     #else
-        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
+        DATA_TYPE input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
         for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
             for (int j = 0; j < STREAMING_WIDTH; j++) {
                 input_buf[j] = input[i + j];
@@ -26,14 +25,14 @@ int main()
     return 0;
 }
 
-void kernel(float input[], float output[], float negative_slope)
+void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE negative_slope)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
-    #pragma clang loop vectorize(disable) unroll_count(1)
-    for (int i = 0; i < NTAPS; i++) {
-        float x = input[i];
-        if (x >= (float)(0.0)) output[i] = x;
+    #pragma clang loop unroll_count(1) vectorize(disable)
+    for (int i = 0; i < LOOP_LENGTH; i++) {
+        DATA_TYPE x = input[i];
+        if (x >= (DATA_TYPE)(const1)) output[i] = x;
         else output[i] = negative_slope * x;
     }
 }

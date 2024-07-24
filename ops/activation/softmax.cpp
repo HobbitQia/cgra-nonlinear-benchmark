@@ -1,26 +1,36 @@
 #include "../include/utils.h"
 
-float input[NTAPS];
-float output[NTAPS];
+DATA_TYPE input[NTAPS], output[NTAPS], input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
 
-void softmax_loop1(float input[], float output[], float *max);
-void softmax_loop2(float input[], float output[], float *max, float *sum);
-void softmax_loop3(float input[], float output[], float *sum);
+void softmax_loop1(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max);
+void softmax_loop2(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max, DATA_TYPE *sum);
+void softmax_loop3(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *sum);
 
 int main()
 {
-    float sum = 0.0, max = -10000.0;
+    
+    DATA_TYPE sum = 0, max = -10000;
+    DATA_TYPE input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
+
     #ifndef __STREAMING_ENBALED__
         softmax_loop1(input, output, &max);
         softmax_loop2(input, output, &max, &sum);
         softmax_loop3(input, output, &sum);
     #else
-        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
         for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
             for (int j = 0; j < STREAMING_WIDTH; j++) {
                 input_buf[j] = input[i + j];
             }
             softmax_loop1(input, output, &max);
+        }
+        for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                input_buf[j] = input[i + j];
+            }
+            softmax_loop2(input, output, &max);
+            for (int j = 0; j < STREAMING_WIDTH; j++) {
+                output[i + j] = output_buf[j];
+            }
         }
         for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
             for (int j = 0; j < STREAMING_WIDTH; j++) {
@@ -36,36 +46,36 @@ int main()
     return 0;
 }
 
-void softmax_loop1(float input[], float output[], float *max) 
+void softmax_loop1(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max) 
 {
-    float maxx = *max;
+    DATA_TYPE maxx = *max;
     #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
-        float x0 = input[i];
+        DATA_TYPE x0 = input[i];
         if (x0 > maxx) maxx = x0;
     }
     *max = maxx;
 }
 
-void softmax_loop2(float input[], float output[], float *max, float *sum) 
+void softmax_loop2(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max, DATA_TYPE *sum) 
 {
-    float summ = *sum;
-    float maxx = *max;
+    DATA_TYPE summ = *sum;
+    DATA_TYPE maxx = *max;
     #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
-        float x0 = input[i];
-        float e0 = exp(x0 - maxx);
+        DATA_TYPE x0 = input[i];
+        DATA_TYPE e0 = exp(x0 - maxx);
         output[i] = e0;
         summ += e0;
     }
     *sum = summ;
 }
 
-void softmax_loop3(float input[], float output[], float *sum) 
+void softmax_loop3(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *sum) 
 {
-    float summ = *sum;
+    DATA_TYPE summ = *sum;
     #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
-    for (int i = 0; i < NTAPS; i++) {
+    for (int i = 0; i < LOOP_LENGTH; i++) {
         output[i] = input[i] / summ;
     }
 }

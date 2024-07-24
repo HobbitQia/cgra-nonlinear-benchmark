@@ -1,16 +1,17 @@
 #include "../include/utils.h"
 
-float input[NTAPS];
-float output[NTAPS];
+DATA_TYPE input[NTAPS], output[NTAPS];
+//  0.79788456 0.044715  -2.0 1.0 0.5
+const DATA_TYPE const1 = 5, const2 = 6, const3 = -2, const4 = 1, const5 = 3;   
 
-void kernel(float input[], float output[]);
+void kernel(DATA_TYPE input[], DATA_TYPE output[]);
 
 int main()
 {
+    DATA_TYPE input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
     #ifndef __STREAMING_ENBALED__
         kernel(input, output);
     #else
-        float input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
         for (int i = 0; i < NTAPS; i += STREAMING_WIDTH) {
             for (int j = 0; j < STREAMING_WIDTH; j++) {
                 input_buf[j] = input[i + j];
@@ -25,16 +26,17 @@ int main()
     return 0;
 }
 
-void kernel(float input[], float output[])
+void kernel(DATA_TYPE input[], DATA_TYPE output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
-    for (int i = 0; i < NTAPS; i++) {
-        float x = input[i];
-        float xx = (float)(0.79788456) * (x + (float)(0.044715) * x * x * x);
-        float exp_2x = exp(xx * (float)(-2.0));
-        float tanh_x = ((float)(1.0) - exp_2x) / ((float)(1.0) + exp_2x);
-        output[i] = (float)(0.5) * x * ((float)(1.0) + tanh_x);
+    for (int i = 0; i < LOOP_LENGTH; i++) {
+        DATA_TYPE x = input[i];
+        // const1 should be 2/sqrt pi * (-2)
+        DATA_TYPE xx = (DATA_TYPE)(const1) * (x + (DATA_TYPE)(const2) * x * x * x);
+        DATA_TYPE exp_2x = exp(xx);
+        DATA_TYPE tanh_x = ((DATA_TYPE)(const4) - exp_2x) / ((DATA_TYPE)(const4) + exp_2x);
+        output[i] = (DATA_TYPE)(const5) * x * ((DATA_TYPE)(const4) + tanh_x);
     }
 }
