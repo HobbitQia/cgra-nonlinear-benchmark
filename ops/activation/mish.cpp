@@ -29,6 +29,7 @@ void kernel(DATA_TYPE input[], DATA_TYPE output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
+    // #pragma unroll 6 vectorize(disable)//vectorize_width(4)
     #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         DATA_TYPE x = input[i];

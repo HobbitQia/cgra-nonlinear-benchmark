@@ -30,13 +30,23 @@ void kernel(DATA_TYPE input[], DATA_TYPE output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
+    // #pragma unroll 6 vectorize(disable)//vectorize_width(4)
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
+        #ifdef INTEGER_MODE
+            DATA_TYPE x = intConvert(input[i]);
+        #else
+            DATA_TYPE x = fpConvert(input[i]);
+        #endif  
         // const1 should be 2/sqrt pi * (-2)
         DATA_TYPE xx = (DATA_TYPE)(const1) * (x + (DATA_TYPE)(const2) * x * x * x);
         DATA_TYPE exp_2x = exp(xx);
         DATA_TYPE tanh_x = ((DATA_TYPE)(const4) - exp_2x) / ((DATA_TYPE)(const4) + exp_2x);
-        output[i] = (DATA_TYPE)(const5) * x * ((DATA_TYPE)(const4) + tanh_x);
+        DATA_TYPE res = (DATA_TYPE)(const5) * x * ((DATA_TYPE)(const4) + tanh_x);
+        #ifdef INTEGER_MODE
+            output[i] = intConvert(res);
+        #else
+            output[i] = fpConvert(res);
+        #endif
     }
 }

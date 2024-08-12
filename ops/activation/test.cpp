@@ -33,9 +33,8 @@ void kernel(int input[], int output[], float s_in)
 {   
     // s_in 会被优化掉
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        float s = intExp_s(s_in);
-        float x = intExp(input[i], s_in);
-        output[i]  = s * x;
+        float s = input[i];
+        output[i]  = s * s + s;
         
     }
     // float max = 0.0;
