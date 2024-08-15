@@ -29,10 +29,11 @@ void kernel(DATA_TYPE input[], DATA_TYPE output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
-    // #pragma unroll 6 vectorize(disable)//vectorize_width(4)
+    // #pragma unroll 4 vectorize(disable)//vectorize_width(4)
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
-        output[i] = log(sigmoid(x) - (DATA_TYPE)(const1));
+        DATA_TYPE x = Convert(input[i]);
+        DATA_TYPE tmp = sigmoid(x);
+        output[i] = log(tmp);
     }
 }

@@ -3,7 +3,7 @@
 DATA_TYPE input[NTAPS], output[NTAPS];
 const DATA_TYPE alpha = 5, scale = 3, const1 = 1, const2 = 0;   // 1.67 1.05 1.0 0.0
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE scale, DATA_TYPE alpha);
+void kernel(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE scale, DATA_TYPE alpha);
 
 int main()
 {    
@@ -25,14 +25,14 @@ int main()
     return 0;
 }
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE scale, DATA_TYPE alpha)
+void kernel(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE scale, DATA_TYPE alpha)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
-    #pragma unroll 8 vectorize(disable)
-    // #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
+    // #pragma unroll 8 vectorize(disable)
+    #pragma clang loop unroll_count(1) vectorize(enable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
-        output[i] = scale * (max((DATA_TYPE)(const2), x)) + min((DATA_TYPE)(const2), alpha * (exp(x) - (DATA_TYPE)(const1)));
+        DATA_TYPE x = Convert(input[i]);
+        output[i] = Convert(scale * (max((DATA_TYPE)(const2), x)) + min((DATA_TYPE)(const2), alpha * (exp(x) - (DATA_TYPE)(const1))));
     }
 }

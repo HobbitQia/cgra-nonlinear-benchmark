@@ -25,16 +25,16 @@ int main()
     return 0;
 }
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[])
+void kernel(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE alpha)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
     // #pragma unroll 8 vectorize(disable)//vectorize_width(4)
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
-        if (x <= (DATA_TYPE)(const1)) output[i] = (DATA_TYPE)(const3);
-        else if (x >= (DATA_TYPE)(const2)) output[i] = x;
-        else output[i] = x * (x + (DATA_TYPE)(const2)) * (DATA_TYPE)(const4);
+        DATA_TYPE x = Convert(input[i]);
+        if (x <= (DATA_TYPE)(const1)) output[i] = Convert((DATA_TYPE)(const3));
+        else if (x >= (DATA_TYPE)(const2)) output[i] = Convert(x);
+        else output[i] = Convert(x * (x + (DATA_TYPE)(const2)) * (DATA_TYPE)(const4));
     }
 }

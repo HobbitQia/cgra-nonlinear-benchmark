@@ -3,7 +3,7 @@
 DATA_TYPE input[NTAPS], output[NTAPS];
 const DATA_TYPE negative_slope = -3, const1 = 0;    // 0.0
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE negative_slope);
+void kernel(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE negative_slope);
 
 int main()
 {
@@ -25,14 +25,14 @@ int main()
     return 0;
 }
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE negative_slope)
+void kernel(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE negative_slope)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
     // #pragma unroll 4 vectorize(disable)//vectorize_width(4)
-    #pragma clang loop unroll_count(1) vectorize(disable)
+    #pragma clang loop unroll_count(1) vectorize(enable)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
+        DATA_TYPE x = Convert(input[i]);
         if (x >= (DATA_TYPE)(const1)) output[i] = x;
         else output[i] = negative_slope * x;
     }

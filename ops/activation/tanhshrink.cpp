@@ -32,8 +32,8 @@ void kernel(DATA_TYPE input[], DATA_TYPE output[])
     // #pragma unroll 6 vectorize(disable)//vectorize_width(4)
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
+        DATA_TYPE x = Convert(input[i]);
         DATA_TYPE exp_2x = exp(x * (DATA_TYPE)(const2));
-        output[i] = x - ((DATA_TYPE)(const2) - exp_2x) / ((DATA_TYPE)(const2) + exp_2x);
+        output[i] = Convert(x - ((DATA_TYPE)(const2) - exp_2x) / ((DATA_TYPE)(const2) + exp_2x));
     }
 }

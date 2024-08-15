@@ -2,8 +2,8 @@
 
 DATA_TYPE input[NTAPS], output[NTAPS], input_buf[STREAMING_WIDTH], output_buf[STREAMING_WIDTH];
 
-void softmax_loop1(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max);
-void softmax_loop2(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max, DATA_TYPE *sum);
+void softmax_loop1(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict max);
+void softmax_loop2(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict max, DATA_TYPE* __restrict sum);
 void softmax_loop3(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *sum);
 
 int main()
@@ -46,26 +46,26 @@ int main()
     return 0;
 }
 
-void softmax_loop1(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max) 
+void softmax_loop1(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict max) 
 {
     DATA_TYPE maxx = *max;
-    #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
+    #pragma clang loop unroll_count(4) vectorize(enable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
-        DATA_TYPE x0 = input[i];
+        DATA_TYPE x0 = Convert(input[i]);
         if (x0 > maxx) maxx = x0;
     }
     *max = maxx;
 }
 
-void softmax_loop2(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *max, DATA_TYPE *sum) 
+void softmax_loop2(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict max, DATA_TYPE* __restrict sum) 
 {
     DATA_TYPE summ = *sum;
     DATA_TYPE maxx = *max;
-    #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
+    #pragma clang loop unroll_count(4) vectorize(enable)//vectorize_width(1)
     for (int i = 0; i < NTAPS; i++) {
-        DATA_TYPE x0 = input[i];
+        DATA_TYPE x0 = Convert(input[i]);
         DATA_TYPE e0 = exp(x0 - maxx);
-        output[i] = e0;
+        output[i] = Convert(e0);
         summ += e0;
     }
     *sum = summ;
@@ -76,6 +76,6 @@ void softmax_loop3(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *sum)
     DATA_TYPE summ = *sum;
     #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        output[i] = input[i] / summ;
+        output[i] = Convert(Convert(input[i]) / summ);
     }
 }

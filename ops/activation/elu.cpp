@@ -3,7 +3,7 @@
 DATA_TYPE input[NTAPS], output[NTAPS];
 const DATA_TYPE alpha = 3, const1 = 0, const2 = 1;      // 0.1 0.0 1.0
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE alpha);
+void kernel(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE alpha);
 
 int main()
 {
@@ -25,15 +25,15 @@ int main()
     return 0;
 }
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE alpha)
+void kernel(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE alpha)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
     // #pragma unroll 8 vectorize(disable)//vectorize_width(4)
-    #pragma clang loop unroll_count(1) vectorize_width(4)
+    #pragma clang loop unroll_count(4) vectorize(enable)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
-        if (x > (DATA_TYPE)(const1)) output[i] = x;
-        else output[i] = alpha * (exp(x) - (DATA_TYPE)(const2));
+        DATA_TYPE x = Convert(input[i]);
+        if (x > (DATA_TYPE)(const1)) output[i] = Convert(x);
+        else output[i] = Convert(alpha * (exp(x) - (DATA_TYPE)(const2)));
     }
 }

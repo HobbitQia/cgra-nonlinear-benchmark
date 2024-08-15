@@ -5,8 +5,8 @@ DATA_TYPE alpha = 3;         // 0.2
 
 const DATA_TYPE eps = 1;    // 1e-5
 
-void rmsnorm_loop1(DATA_TYPE input[], DATA_TYPE *variance);
-void rmsnorm_loop2(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *invsqrt, DATA_TYPE alpha);
+void rmsnorm_loop1(DATA_TYPE* __restrict input, DATA_TYPE* __restrict variance);
+void rmsnorm_loop2(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict invsqrt, DATA_TYPE alpha);
 
 int main()
 {
@@ -42,10 +42,10 @@ int main()
     return 0;
 }
 
-void rmsnorm_loop1(DATA_TYPE input[], DATA_TYPE *variance) 
+void rmsnorm_loop1(DATA_TYPE* __restrict input, DATA_TYPE* __restrict variance)
 {
     DATA_TYPE var = *variance;
-    #pragma clang loop unroll_count(4) vectorize(disable)
+    #pragma clang loop unroll_count(4) vectorize(enable)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         DATA_TYPE x = input[i];
         var += x * x;
@@ -53,10 +53,10 @@ void rmsnorm_loop1(DATA_TYPE input[], DATA_TYPE *variance)
     *variance = var;
 }
 
-void rmsnorm_loop2(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *invsqrt, DATA_TYPE alpha) 
+void rmsnorm_loop2(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict invsqrt, DATA_TYPE alpha) 
 {
     DATA_TYPE inv_stddev = *invsqrt;
-    #pragma clang loop unroll_count(4) vectorize(disable)
+    #pragma clang loop unroll_count(4) vectorize(enable)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         output[i] = (input[i]) * inv_stddev * alpha;
     }

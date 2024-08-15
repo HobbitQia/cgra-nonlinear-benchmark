@@ -8,9 +8,9 @@ KERNEL := _Z6kernelPfS_S_
 $(target): 
 	mkdir -p build
 	clang-12 -emit-llvm -fno-unroll-loops -O3 -o $(BUILD_DIR)/$(target).bc -c $(target).cpp
-	opt --loop-unroll --unroll-count=6  $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).bc
-	# llvm-dis $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).ll
-	opt -load $(PASS_DIR)/libmapperPass.so -mapperPass $(BUILD_DIR)/$(target).bc
+	opt-12 --loop-unroll --unroll-count=1  $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).bc
+	llvm-dis-12 $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).ll
+	opt-12 -load $(PASS_DIR)/libmapperPass.so -mapperPass $(BUILD_DIR)/$(target).bc
 	mv *.dot $(BUILD_DIR)	
 	dot -Tpng $(BUILD_DIR)/*.dot -o $(BUILD_DIR)/$(target).png
 	mv config.json $(BUILD_DIR)/$(target)_config.json

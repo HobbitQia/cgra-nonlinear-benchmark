@@ -29,12 +29,13 @@ void kernel(DATA_TYPE input[], DATA_TYPE output[])
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
-    // #pragma unroll 6 vectorize(disable)//vectorize_width(4)
-    #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(4)
+    #pragma unroll 4 vectorize(disable)//vectorize_width(4)
+    // #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
+        DATA_TYPE x = Convert(input[i]);
         // const2 should be beta1 * -2
-        DATA_TYPE softplus_x = (DATA_TYPE)(const2) * log(exp(beta2 * x));
+        DATA_TYPE tmp = exp(beta2 * x) + (DATA_TYPE)(const1);
+        DATA_TYPE softplus_x = (DATA_TYPE)(const2) * log(tmp);
         DATA_TYPE exp_2x = exp(softplus_x);
         output[i] = x * ((DATA_TYPE)(const1) - exp_2x) / ((DATA_TYPE)(const1) + exp_2x);
     }

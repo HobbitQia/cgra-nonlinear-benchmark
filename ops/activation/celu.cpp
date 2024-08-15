@@ -31,7 +31,7 @@ void kernel(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE alpha)
     // #pragma unroll 8 vectorize(disable)//vectorize_width(4)
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE x = input[i];
-        output[i] = max((DATA_TYPE)(const1), x) + min((DATA_TYPE)(const1), alpha * (exp(x / alpha) - (DATA_TYPE)(const2)));
+        DATA_TYPE x = Convert(input[i]);
+        output[i] = Convert(max((DATA_TYPE)(const1), x) + min((DATA_TYPE)(const1), alpha * (exp(x / alpha) - (DATA_TYPE)(const2))));
     }
 }

@@ -32,8 +32,8 @@ void kernel(DATA_TYPE a[], DATA_TYPE b[], DATA_TYPE output[])
     // #pragma unroll 8 vectorize(disable)//vectorize_width(4)
     #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
-        DATA_TYPE ai = a[i];
-        DATA_TYPE bi = b[i];
-        output[i] = ai * sigmoid(bi);
+        DATA_TYPE ai = Convert(a[i]);
+        DATA_TYPE bi = Convert(b[i]);
+        output[i] = Convert(ai * sigmoid(bi));
     }
 }
