@@ -4,7 +4,7 @@ DATA_TYPE input[NTAPS], output[NTAPS], input_buf[STREAMING_WIDTH], output_buf[ST
 
 void softmax_loop1(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict max);
 void softmax_loop2(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict max, DATA_TYPE* __restrict sum);
-void softmax_loop3(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *sum);
+void softmax_loop3(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict sum);
 
 int main()
 {
@@ -71,10 +71,10 @@ void softmax_loop2(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DA
     *sum = summ;
 }
 
-void softmax_loop3(DATA_TYPE input[], DATA_TYPE output[], DATA_TYPE *sum) 
+void softmax_loop3(DATA_TYPE* __restrict input, DATA_TYPE* __restrict output, DATA_TYPE* __restrict sum) 
 {
     DATA_TYPE summ = *sum;
-    #pragma clang loop unroll_count(4) vectorize(disable)//vectorize_width(1)
+    #pragma clang loop unroll_count(4) vectorize(enable)//vectorize_width(1)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         output[i] = Convert(Convert(input[i]) / summ);
     }

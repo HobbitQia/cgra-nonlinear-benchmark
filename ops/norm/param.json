@@ -1,5 +1,5 @@
 {
-  "kernel"                : "_Z13rmsnorm_loop2PiS_S_i",
+  "kernel"                : "_Z15layernorm_loop2PiS_S_ii",
   "targetFunction"        : false,
   "targetNested"          : false,
   "targetLoopsID"         : [0],

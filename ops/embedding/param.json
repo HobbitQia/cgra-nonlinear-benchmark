@@ -1,5 +1,5 @@
 {
-  "kernel"                : "_Z6kernelPfS_if",
+  "kernel"                : "_Z6kernelPfS_fi",
   "targetFunction"        : false,
   "targetNested"          : false,
   "targetLoopsID"         : [0],
@@ -18,19 +18,21 @@
   "regConstraint"         : 8,
   "optLatency"            : {
                               "load" : 2,
-                              "store": 2
+                              "store": 2,
+                              "div" : 4
                             },
-  "optPipelined"          : ["load", "store"],
+  "optPipelined"          : ["load", "store", "div"],
   "additionalFunc"        : {
                               "call" : [4,8,7,11],
                               "load" : [0,1,2,3],
                               "store": [0,1,2,3],
-                              "lut" : [4,8,7,11],
-                              "complex1" : [5,6,9,10],
-                              "complex2" : [4,7,8,11],
-                              "complex3" : [0,1,2,3,12,13,14,15],
-                              "div" : [5,6,9,10],
-                              "quantize" : [1,2,3,4,5]
+                              "lut" : [],
+                              "complex1" : [4,5,6,7],
+                              "complex2" : [8,9,10,11],
+                              "complex3" : [],
+                              "div" : [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+                              "quantize" : [],
+                              "dequantize" : [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+                              "convert" : []
                             }
 }
-

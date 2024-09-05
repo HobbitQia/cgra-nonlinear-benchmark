@@ -8,7 +8,7 @@ KERNEL := kernel
 $(target): 
 	mkdir -p build
 	clang-12 -emit-llvm -fno-unroll-loops -O3 -o $(BUILD_DIR)/$(target).bc -c $(target).cpp
-	opt-12 --loop-unroll --unroll-count=1   $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).bc
+	opt-12 --loop-unroll --unroll-count=4   $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).bc
 	# opt-12 -loop-vectorize -force-vector-width=2      $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).bc
 	opt-12 -load $(PASS_DIR)/libmapperPass.so -mapperPass $(BUILD_DIR)/$(target).bc
 	llvm-dis-12 $(BUILD_DIR)/$(target).bc -o $(BUILD_DIR)/$(target).ll

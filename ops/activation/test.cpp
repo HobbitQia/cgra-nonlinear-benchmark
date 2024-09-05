@@ -37,6 +37,6 @@ void kernel(float* __restrict input, float* __restrict output, float s_in)
     // #pragma clang loop vectorize(enable)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         float x  = input[i];
-        output[i] = x + i;
+        output[i] = x / s_in;
     }
 }

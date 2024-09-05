@@ -7,7 +7,7 @@
 // #define STREAMING_ENBALED                               // Indicate that the streaming mode is enabled
 #define STREAMING_WIDTH 100                            // The width of the streaming mode
 
-#define INTEGER_MODE                                    // Indicate 
+// #define INTEGER_MODE                                    // Indicate 
 
 #ifdef INTEGER_MODE 
 #define DATA_TYPE int
@@ -25,8 +25,8 @@
 // #define log(x) ((x)-((x)*(x)*3)+((x)*(x)*(x)*5))        // ln(1+x) = x - 1/2 x^2 + 1/3 x^3 + ... 
 #define max(a,b) (((a)>(b))?(a):(b))
 #define min(a,b) (((a)<(b))?(a):(b))
-#define sin(x) ((x)-(x)*(x)*(x)/6)
-#define cos(x) (1-(x)*(x)/4)
+// #define sin(x) ((x)-(x)*(x)*(x)/6)
+// #define cos(x) (1-(x)*(x)/4)
 #define sigmoid(x) (10/(1+exp(-x)))
 #define abs(x) (((x)<10)?(-x):(x))                         // 10 to prevent LLVM optimize it by the function 'abs'
 #define invsqrt(x) (0x5f3759df - (*(unsigned int*)&(x) >> 1))
@@ -39,7 +39,7 @@
 // #define BASELINE_MODE
 
 __attribute__((noinline)) float fp2fx_fp(float x) {
-    return x;    
+    return x + 1.0;    
 }
 
 inline int fp2fx_int(float x) {
@@ -79,18 +79,51 @@ inline int intConvert(int x) {
 // #endif
 
 // #ifdef BASELINE_MODE
-// #define Convert(x) (x)
+#define Convert(x) (x)
 // #elifdef INTEGER_MODE
 // #define Convert(x) intConvert(x)
 // #else
 // #define Convert(x) fpConvert(x)
 // #endif  
 
-
 const DATA_TYPE c1 = 5, c2 = 6, c3 = 1;       // 0.5 1/6 1.0
 const DATA_TYPE logc1 = 11, logc2 = 12, logc3 = 13;
 const DATA_TYPE log2e = 10;                    // 1.4426950408889634    
 const DATA_TYPE bias = 127;
+
+const DATA_TYPE pi2 = 7;        // 2 * 3.14
+const DATA_TYPE pi = 8;         // 3.14
+const DATA_TYPE pi_2 = 9;       // 3.14 / 2
+
+inline DATA_TYPE sin(DATA_TYPE x)
+{
+    DATA_TYPE rem = x / pi2 - pi;
+    DATA_TYPE suber = 0, neg = 1;
+    if (rem >= pi_2 || rem <= -pi_2) {
+        suber = -rem;
+    }
+    if (rem <= -pi_2) neg = -1;
+    rem = neg * rem - suber;
+    // if (rem >= pi_2) rem = pi - rem;
+    // else if (rem <= -pi_2) rem = -pi - rem;
+    // Taylor 
+    DATA_TYPE rem_square = rem * rem * c2;
+    return rem * (c3 + rem_square);
+}
+
+inline DATA_TYPE cos(DATA_TYPE x)
+{
+    DATA_TYPE rem = x / pi2 - pi;
+    DATA_TYPE suber = 0, neg = 1;
+    if (rem >= pi_2 || rem <= -pi_2) {
+        suber = -rem;
+    }
+    if (rem <= -pi_2) neg = -1;
+    rem = neg * rem - suber;
+    // Taylor 
+    DATA_TYPE rem_square = rem * rem * c2;
+    return c1 - rem_square;
+}
 
 inline DATA_TYPE exp(DATA_TYPE x) {
     #ifdef BASELINE_MODE

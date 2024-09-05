@@ -1,5 +1,5 @@
 {
-  "kernel"                : "_Z13softmax_loop1PfS_S_",
+  "kernel"                : "_Z13softmax_loop3PfS_S_",
   "targetFunction"        : false,
   "targetNested"          : false,
   "targetLoopsID"         : [0],
