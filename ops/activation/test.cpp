@@ -34,7 +34,7 @@ void kernel(float* __restrict input, float* __restrict output, float s_in)
     // float* input = __builtin_assume_aligned(inputt, 4);
     // float* output = __builtin_assume_aligned(outputt,4);
     // s_in 会被优化掉
-    // #pragma clang loop vectorize(enable)
+    #pragma clang loop vectorize(disable)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         float x  = input[i];
         output[i] = x / s_in;

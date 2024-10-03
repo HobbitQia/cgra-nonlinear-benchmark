@@ -30,7 +30,7 @@ void kernel(DATA_TYPE* __restrict__ a, DATA_TYPE* __restrict__ b, DATA_TYPE* __r
 /*   output:           output sample array */
 {
     // #pragma unroll 4 vectorize(disable)//vectorize_width(4)
-    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
+    #pragma clang loop unroll_count(1) vectorize(enable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         DATA_TYPE ai = Convert(a[i]);
         DATA_TYPE bi = Convert(b[i]);

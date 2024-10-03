@@ -4,7 +4,7 @@ DATA_TYPE input[NTAPS], output[NTAPS];
 //  0.79788456 0.044715  -2.0 1.0 0.5 
 DATA_TYPE const0 = 0; 
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[]);
+void kernel(DATA_TYPE* __restrict__ input, DATA_TYPE* __restrict__ output);
 
 int main()
 {
@@ -26,12 +26,12 @@ int main()
     return 0;
 }
 
-void kernel(DATA_TYPE input[], DATA_TYPE output[])
+void kernel(DATA_TYPE* __restrict__ input, DATA_TYPE* __restrict__ output)
 /*   input :           input sample array */
 /*   output:           output sample array */
 {
     // #pragma unroll 6 vectorize(disable)//vectorize_width(4)
-    #pragma clang loop unroll_count(1) vectorize(disable)//vectorize_width(4)
+    #pragma clang loop unroll_count(1) vectorize(enable)//vectorize_width(4)
     for (int i = 0; i < LOOP_LENGTH; i++) {
         DATA_TYPE x = Convert(input[i]);
         // const1 should be 2/sqrt pi * (-2)
